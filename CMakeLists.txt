@@ -67,6 +67,7 @@ target_link_libraries(${PROJECT_NAME}
 
 target_include_directories(${AUX}
   PRIVATE ${Boost_INCLUDE_DIR}
+  thread
 )
 
 target_link_libraries(${AUX}
