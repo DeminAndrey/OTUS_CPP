@@ -8,10 +8,11 @@ endif()
 
 configure_file(version.h.in version.h)
 
-find_package(Boost)
+find_package(Boost
+  COMPONENTS thread REQUIRED)
 
-set(AUX_TARGET auxiliary)
-set(TEST_TARGET tests)
+set(AUX auxiliary)
+set(TEST tests)
 
 add_executable(${PROJECT_NAME}
   main.cxx
@@ -19,13 +20,13 @@ add_executable(${PROJECT_NAME}
   ip.h
 )
 
-add_executable(${TEST_TARGET}
+add_executable(${TEST}
   input.h
   output.h
   tests.cxx
 )
 
-add_library(${AUX_TARGET}
+add_library(${AUX}
   auxiliary.h
   auxiliary.cxx
 )
@@ -48,27 +49,27 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-target_link_libraries(${TEST_TARGET}
-  ${AUX_TARGET}
+target_link_libraries(${TEST}
+  ${AUX}
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(${TEST_TARGET})
+gtest_discover_tests(${TEST})
 
 target_include_directories(${PROJECT_NAME}
   PRIVATE "${CMAKE_BINARY_DIR}"
 )
 
 target_link_libraries(${PROJECT_NAME}
-  PRIVATE ${AUX_TARGET}
+  PRIVATE ${AUX}
 )
 
-target_include_directories(${AUX_TARGET}
+target_include_directories(${AUX}
   PRIVATE ${Boost_INCLUDE_DIR}
 )
 
-target_link_libraries(${AUX_TARGET}
+target_link_libraries(${AUX}
   PRIVATE ${Boost_LIBRARY_DIR}
 )
 
@@ -76,20 +77,20 @@ if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         /W4
     )
-    target_compile_options(${TEST_TARGET} PRIVATE
+    target_compile_options(${TEST} PRIVATE
         /W4
     )
-    target_compile_options(${AUX_TARGET} PRIVATE
+    target_compile_options(${AUX} PRIVATE
         /W4
     )
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE
         -Werror -Wall -Wimplicit-fallthrough -pedantic-errors
     )
-    target_compile_options(${TEST_TARGET} PRIVATE
+    target_compile_options(${TEST} PRIVATE
         -Werror -Wall -Wimplicit-fallthrough -pedantic-errors
     )
-    target_compile_options(${AUX_TARGET} PRIVATE
+    target_compile_options(${AUX} PRIVATE
         -Werror -Wall -Wimplicit-fallthrough -pedantic-errors
     )
 endif()
@@ -107,4 +108,4 @@ set(CPACK_PACKAGE_CONTACT example@example.com)
 include(CPack)
 
 enable_testing()
-add_test(main_test ${TEST_TARGET})
+add_test(main_test ${TEST})
